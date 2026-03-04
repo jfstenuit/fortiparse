@@ -1,0 +1,100 @@
+# Configuration and generated files - DO NOT COMMIT
+################################################################################
+
+# Parsed/generated JSON configurations
+*.json
+!sample_config.json
+
+# YAML configuration backups (may contain sensitive data)
+*.yaml
+*.yml
+!config-sample.json
+!config-sample.yaml
+
+# Generated audit reports
+report.md
+test_report.md
+*.report.md
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.log
+
+# Python runtime artifacts
+################################################################################
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+################################################################################
+venv/
+ENV/
+env/
+.venv
+.env
+
+# IDE and editor files
+################################################################################
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.iml
+.sublime-project
+.sublime-workspace
+
+# Testing and coverage
+################################################################################
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# OS-specific files
+################################################################################
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# Git-related
+.git/
+.gitmodules
+
+# Local development
+################################################################################
+# Keep only sample/example files, not actual configs or reports
+!config-sample.json
+!config-sample.yaml
+!sample_rule.py
