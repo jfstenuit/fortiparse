@@ -42,7 +42,7 @@ And MUST be placed under the correct section aggregator.
 - PSK reused pattern
 
 ## Section 5 – Interfaces / Management
-- Exposed management
+- [x] Exposed management  # implemented as `rules/rule_exposed_management.py`
 - [x] Weak certs / factory CA still present  # implemented as `rules/rule_weak_certificates.py`
 - [x] SNMP DES / MD5 / v1-v2c / no-ACL  # implemented as `rules/rule_snmp_des.py`
 

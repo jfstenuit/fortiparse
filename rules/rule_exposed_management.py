@@ -9,7 +9,7 @@ def run(vdom):
     """
 
     findings = []
-    interface_list = vdom.get("system_interface", [])
+    interface_list = vdom.get("system", {}).get("interface", [])
 
     # Management services considered sensitive on external interfaces
     mgmt_keywords = {"https", "http", "ssh", "telnet", "snmp", "fgfm"}
