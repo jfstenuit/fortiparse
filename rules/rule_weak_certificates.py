@@ -83,11 +83,12 @@ def run(vdom):
     ]
 
     # 1. Direct certificate arrays
-    if "certificate_local" in vdom:
-        certs.extend(vdom["certificate_local"])
+    vpn_section = vdom.get("vpn", {})
+    if "certificate_local" in vpn_section:
+        certs.extend(vpn_section["certificate_local"])
 
-    if "certificate_ca" in vdom:
-        certs.extend(vdom["certificate_ca"])
+    if "certificate_ca" in vpn_section:
+        certs.extend(vpn_section["certificate_ca"])
 
     # 2. PKI / other structures
     pki = vdom.get("pki", {})
@@ -97,51 +98,56 @@ def run(vdom):
     # =========================================
     # If references to cert names exist, we warn (but cannot resolve)
     # =========================================
-    sslvpn = vdom.get("vpn_ssl_settings", {})
-    admin_cert_name = vdom.get("system_global", {}).get("admin-server-cert")
+    sslvpn = vdom.get("vpn", {}).get("ssl_settings", {})
+    admin_cert_name = vdom.get("system", {}).get("global", {}).get("admin-server-cert")
 
     if admin_cert_name:
         findings.append(
             f"* Admin GUI uses certificate `{admin_cert_name}` (reference only, cannot resolve details)"
         )
 
-    if "server-cert" in sslvpn:
+    if sslvpn.get("servercert"):
         findings.append(
-            f"* SSL-VPN uses certificate `{sslvpn.get('server-cert')}` (reference only, cannot resolve details)"
+            f"* SSL-VPN uses certificate `{sslvpn.get('servercert')}` (reference only, cannot resolve details)"
         )
 
     # =========================================
     # Evaluate actual certificate objects
     # =========================================
-    for cert in certs:
-        if not isinstance(cert, dict):
+    for entry in certs:
+        if not isinstance(entry, dict):
             continue
 
-        name = cert.get("name", "<unnamed>")
+        for name, cert in entry.items():
+            if not isinstance(cert, dict):
+                continue
 
-        # 1. Self-signed
-        if _is_self_signed(cert):
-            findings.append(f"* **{name}**: self-signed certificate")
+            # inject name so helpers can reference it
+            cert_with_name = {"name": name, **cert}
 
-        # 2. Expired
-        if _is_expired(cert):
-            findings.append(f"* **{name}**: expired certificate (`valid-to: {cert.get('valid-to')}`)")
+            # 1. Self-signed
+            if _is_self_signed(cert_with_name):
+                findings.append(f"* **{name}**: self-signed certificate")
 
-        # 3. Weak key
-        if _is_weak_key(cert):
-            findings.append(
-                f"* **{name}**: weak key size `{cert.get('key-size')}` for `{cert.get('key-type')}`"
-            )
+            # 2. Expired
+            if _is_expired(cert_with_name):
+                findings.append(f"* **{name}**: expired certificate (`valid-to: {cert.get('valid-to')}`)")
 
-        # 4. SHA1 signature
-        if _is_sha1_signed(cert):
-            findings.append(
-                f"* **{name}**: weak signature algorithm `{cert.get('signature-algorithm')}`"
-            )
+            # 3. Weak key
+            if _is_weak_key(cert_with_name):
+                findings.append(
+                    f"* **{name}**: weak key size `{cert.get('key-size')}` for `{cert.get('key-type')}`"
+                )
 
-        # 5. Factory Fortinet cert
-        if _is_factory_fortinet(cert):
-            findings.append(f"* **{name}**: factory or default Fortinet certificate")
+            # 4. SHA1 signature
+            if _is_sha1_signed(cert_with_name):
+                findings.append(
+                    f"* **{name}**: weak signature algorithm `{cert.get('signature-algorithm')}`"
+                )
+
+            # 5. Factory Fortinet cert
+            if _is_factory_fortinet(cert_with_name):
+                findings.append(f"* **{name}**: factory or default Fortinet certificate")
 
     # =========================================
     # Output formatting

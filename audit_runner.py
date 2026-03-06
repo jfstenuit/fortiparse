@@ -93,7 +93,18 @@ def main():
     # Extract and aggregate the requested VDOM
     vdom_raw = extract_vdom(cfg, args.vdom)
     vdom = aggregate_vdom(vdom_raw)
-    
+
+    # Merge global config so section 5 rules (SNMP, certs, system_global) can
+    # access device-wide settings that are never stored per-vdom.
+    global_raw = cfg.get("global", {})
+    global_data = aggregate_vdom(global_raw)
+    for section, data in global_data.items():
+        if section not in vdom:
+            vdom[section] = data
+        elif isinstance(vdom[section], dict) and isinstance(data, dict):
+            # vdom-specific values take precedence over global defaults
+            vdom[section] = {**data, **vdom[section]}
+
     rules = load_rules()
 
     # Group rules by SECTION key

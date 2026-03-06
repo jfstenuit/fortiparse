@@ -10,74 +10,73 @@ def run(vdom):
     # ------------------------------
     # IPsec Phase1 (interface-based)
     # ------------------------------
-    phase1 = (
-        vdom.get("vpn", {})
-            .get("ipsec", {})
-            .get("phase1-interface", [])
-    )
+    phase1 = vdom.get("vpn", {}).get("ipsec_phase1-interface", [])
 
-    for name, obj in phase1:
-        proposals = obj.get("proposal", "")
+    for entry in phase1:
+        if not isinstance(entry, dict):
+            continue
+        for name, obj in entry.items():
+            if not isinstance(obj, dict):
+                continue
 
-        if proposals:
-            proposal_items = proposals.split()
+            proposals = obj.get("proposal", "")
 
-            for suite in proposal_items:
-                # detect 3des or sha1 inside proposal entry
-                if "3des" in suite.lower():
-                    findings.append(
-                        f"* **{name}**: uses weak encryption (`{suite}`)"
-                    )
-                if "sha1" in suite.lower() and not suite.lower().endswith("sha256"):
-                    findings.append(
-                        f"* **{name}**: uses weak hash (`{suite}`)"
-                    )
+            if proposals:
+                proposal_items = proposals.split()
 
-        # DH group
-        dhgrp = obj.get("dhgrp")
-        if isinstance(dhgrp, int) and dhgrp < 14:
-            findings.append(
-                f"* **{name}**: weak DH group `{dhgrp}` (<14)"
-            )
+                for suite in proposal_items:
+                    # detect 3des or sha1 inside proposal entry
+                    if "3des" in suite.lower():
+                        findings.append(
+                            f"* **{name}**: uses weak encryption (`{suite}`)"
+                        )
+                    if "sha1" in suite.lower() and not suite.lower().endswith("sha256"):
+                        findings.append(
+                            f"* **{name}**: uses weak hash (`{suite}`)"
+                        )
 
-        # Key lifetime
-        lifetime = obj.get("keylife")
-        if lifetime == 3600:
-            findings.append(
-                f"* **{name}**: short keylife `{lifetime}s`"
-            )
+            # DH group
+            dhgrp = obj.get("dhgrp")
+            if isinstance(dhgrp, int) and dhgrp < 14:
+                findings.append(
+                    f"* **{name}**: weak DH group `{dhgrp}` (<14)"
+                )
+
+            # Key lifetime
+            lifetime = obj.get("keylife")
+            if lifetime == 3600:
+                findings.append(
+                    f"* **{name}**: short keylife `{lifetime}s`"
+                )
 
     # ------------------------------
     # IPsec Phase2 (selectors)
     # ------------------------------
-    phase2 = (
-        vdom.get("vpn", {})
-            .get("ipsec", {})
-            .get("phase2-interface", [])
-    )
+    phase2 = vdom.get("vpn", {}).get("ipsec_phase2-interface", [])
 
-    for name, obj in phase2:
+    for entry in phase2:
+        if not isinstance(entry, dict):
+            continue
+        for name, obj in entry.items():
+            if not isinstance(obj, dict):
+                continue
 
-        pfs = obj.get("pfs", "")
-        if pfs == "disable":
-            findings.append(
-                f"* **{name}**: PFS disabled"
-            )
+            pfs = obj.get("pfs", "")
+            if pfs == "disable":
+                findings.append(
+                    f"* **{name}**: PFS disabled"
+                )
 
-        lifetime = obj.get("keylifeseconds")
-        if lifetime == 3600:
-            findings.append(
-                f"* **{name}**: short Phase2 keylife `{lifetime}s`"
-            )
+            lifetime = obj.get("keylifeseconds")
+            if lifetime == 3600:
+                findings.append(
+                    f"* **{name}**: short Phase2 keylife `{lifetime}s`"
+                )
 
     # ------------------------------
     # SSL‑VPN
     # ------------------------------
-    sslvpn = (
-        vdom.get("vpn", {})
-            .get("ssl", {})
-            .get("settings", {})
-    )
+    sslvpn = vdom.get("vpn", {}).get("ssl_settings", {})
 
     if sslvpn:
         # weak algorithms

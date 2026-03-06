@@ -13,7 +13,7 @@ def run(vdom):
     # ================================
     # SNMP v3 Users (strongest signals)
     # ================================
-    snmp_users = vdom.get("system_snmp_user", [])
+    snmp_users = vdom.get("system", {}).get("snmp_user", [])
 
     for entry in snmp_users:
         # Each entry is a dict with a single SNMP user
@@ -37,7 +37,7 @@ def run(vdom):
     # ================================
     # SNMP Communities (v1/v2c)
     # ================================
-    snmp_communities = vdom.get("system_snmp_community", [])
+    snmp_communities = vdom.get("system", {}).get("snmp_community", [])
 
     for entry in snmp_communities:
         # Each entry is a dict with the community name as key
