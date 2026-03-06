@@ -38,17 +38,13 @@ And MUST be placed under the correct section aggregator.
 - [x] Antivirus legacy mode  # implemented as `rules/rule_antivirus_legacy_mode.py`
 
 ## Section 4 – VPNs
-- Weak crypto (3des, sha1)
-- DH < 14
-- Keylife too short
-- PFS disabled
+- [x] Weak crypto (3des, sha1), DH<14, short keylife, PFS disabled  # implemented as `rules/rule_weak_crypto.py`
 - PSK reused pattern
 
 ## Section 5 – Interfaces / Management
 - Exposed management
-- Weak certs
-- Factory CA still present
-- SNMP DES usage
+- [x] Weak certs / factory CA still present  # implemented as `rules/rule_weak_certificates.py`
+- [x] SNMP DES / MD5 / v1-v2c / no-ACL  # implemented as `rules/rule_snmp_des.py`
 
 ## Section 6 – Dashboards
 - Replicated FortiView widgets everywhere
